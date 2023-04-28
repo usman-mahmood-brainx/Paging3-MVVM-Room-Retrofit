@@ -3,10 +3,10 @@ package com.example.paging3_mvvm.models
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "remoteKeys")
-data class RemoteKeys(
+@Entity(tableName = "passenger")
+data class Passenger(
     @PrimaryKey
     val _id:String,
-    val prevKey:Int?,
-    val nextKey:Int?
+    val name: String,
+    val trips: Int
 )

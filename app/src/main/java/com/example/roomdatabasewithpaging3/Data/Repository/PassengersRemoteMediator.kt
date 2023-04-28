@@ -5,9 +5,9 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
+import com.example.paging3_mvvm.models.Passenger
+import com.example.paging3_mvvm.models.RemoteKeys
 import com.example.roomdatabasewithpaging3.Data.Database.Database
-import com.example.roomdatabasewithpaging3.Data.Dogs
-import com.example.roomdatabasewithpaging3.Data.RemoteKeys
 import com.example.roomdatabasewithpaging3.Network.ApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,14 +17,14 @@ import java.io.IOException
 class DogsRemoteMediator constructor(
         private val db:Database,
         private val apiService: ApiService
-)  : RemoteMediator<Int,Dogs>() {
+)  : RemoteMediator<Int,Passenger>() {
     private val STARTING_PAGE_INDEX = 1
 
     override suspend fun initialize(): InitializeAction {
        return InitializeAction.LAUNCH_INITIAL_REFRESH
     }
 
-    override suspend fun load(loadType: LoadType, state: PagingState<Int, Dogs>): MediatorResult {
+    override suspend fun load(loadType: LoadType, state: PagingState<Int, Passenger>): MediatorResult {
         val pageKeyData = getKeyPageData(loadType, state)
         val page  = when(pageKeyData){
             is MediatorResult.Success ->{
@@ -35,20 +35,20 @@ class DogsRemoteMediator constructor(
         }
 
       try {
-          val response = apiService.getAllDogs(page,state.config.pageSize)
-          val endOfList = response.isEmpty()
+          val response = apiService.getPassengers(page,state.config.pageSize)
+          val endOfList = response.data.isEmpty()
           db.withTransaction {
               if(loadType == LoadType.REFRESH){
                   db.remoteKeyDao().clearAll()
-                  db.getDao().clearAll()
+                  db.getPassengerDao().clearAll()
               }
               val prevKey = if (page == STARTING_PAGE_INDEX) null else page-1
               val nextKey = if(endOfList) null else page+1
-              val keys = response.map {
-                  RemoteKeys(it.id,prevKey,nextKey)
+              val keys = response.data.map {
+                  RemoteKeys(it._id,prevKey,nextKey)
               }
-              db.remoteKeyDao().insertRemote(keys)
-              db.getDao().insert(response)
+              db.remoteKeyDao().insertAll(keys)
+              db.getPassengerDao().insert(response.data)
           }
          return MediatorResult.Success(endOfPaginationReached = endOfList)
       }catch (e:IOException){
@@ -59,7 +59,7 @@ class DogsRemoteMediator constructor(
     }
 
 
-    private suspend fun getKeyPageData(loadType: LoadType,state: PagingState<Int, Dogs>) : Any{
+    private suspend fun getKeyPageData(loadType: LoadType,state: PagingState<Int, Passenger>) : Any{
         return when(loadType){
             LoadType.REFRESH->{
                 val remoteKeys = getRefreshRemoteKey(state)
@@ -82,29 +82,29 @@ class DogsRemoteMediator constructor(
         }
     }
 
-    private suspend fun getFirstRemoteKey(state: PagingState<Int, Dogs>) : RemoteKeys? {
+    private suspend fun getFirstRemoteKey(state: PagingState<Int, Passenger>) : RemoteKeys? {
         return withContext(Dispatchers.IO){
             state.pages
                 .firstOrNull { it.data.isNotEmpty() }
                 ?.data?.firstOrNull()
-                ?.let { dog -> db.remoteKeyDao().getRemoteKeys(dog.id)}
+                ?.let { passenger -> db.remoteKeyDao().getAllRemoteKeys(passenger._id)}
         }
     }
 
-    private suspend fun getLastRemoteKey(state: PagingState<Int, Dogs>) : RemoteKeys? {
+    private suspend fun getLastRemoteKey(state: PagingState<Int, Passenger>) : RemoteKeys? {
         return withContext(Dispatchers.IO){
             state.pages
                 .lastOrNull{it.data.isNotEmpty()}
                 ?.data?.lastOrNull()
-                ?.let { dog -> db.remoteKeyDao().getRemoteKeys(dog.id) }
+                ?.let { passenger -> db.remoteKeyDao().getAllRemoteKeys(passenger._id) }
         }
     }
 
-    private suspend fun getRefreshRemoteKey(state: PagingState<Int, Dogs>) : RemoteKeys? {
+    private suspend fun getRefreshRemoteKey(state: PagingState<Int, Passenger>) : RemoteKeys? {
         return withContext(Dispatchers.IO){
             state.anchorPosition?.let { position->
-                state.closestItemToPosition(position)?.id?.let {repId->
-                    db.remoteKeyDao().getRemoteKeys(repId)
+                state.closestItemToPosition(position)?._id?.let {repId->
+                    db.remoteKeyDao().getAllRemoteKeys(repId)
                 }
             }
         }

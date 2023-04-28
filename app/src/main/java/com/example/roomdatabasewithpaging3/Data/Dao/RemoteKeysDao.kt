@@ -1,20 +1,21 @@
-package com.example.roomdatabasewithpaging3.Data.Dao
+package com.example.paging3_mvvm.Room
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.roomdatabasewithpaging3.Data.RemoteKeys
+import com.example.paging3_mvvm.models.Passenger
+import com.example.paging3_mvvm.models.RemoteKeys
 
 @Dao
 interface RemoteKeysDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertRemote(list: List<RemoteKeys>)
+    fun insertAll(passengers:List<RemoteKeys>)
 
-    @Query("SELECT * FROM remoteKey WHERE repoId = :id")
-    fun getRemoteKeys(id:String) : RemoteKeys
+    @Query("Select * From remoteKeys Where _id =:id")
+    fun getAllRemoteKeys(id:String):RemoteKeys
 
-    @Query("DELETE FROM remoteKey")
+    @Query("DELETE FROM remoteKeys")
     fun clearAll()
 }
