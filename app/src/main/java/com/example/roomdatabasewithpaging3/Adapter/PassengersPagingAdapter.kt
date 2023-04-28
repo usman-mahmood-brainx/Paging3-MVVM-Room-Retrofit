@@ -7,8 +7,9 @@ import android.widget.TextView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.paging3_mvvm.R
+
 import com.example.paging3_mvvm.models.Passenger
+import com.example.roomdatabasewithpaging3.R
 import javax.inject.Inject
 
 class PassengersPagingAdapter @Inject constructor() : PagingDataAdapter<Passenger,PassengersPagingAdapter.ViewHolder>(

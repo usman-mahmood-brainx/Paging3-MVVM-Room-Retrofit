@@ -2,14 +2,14 @@ package com.example.roomdatabasewithpaging3.Data.Database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.roomdatabasewithpaging3.Data.Dao.Dao
-import com.example.roomdatabasewithpaging3.Data.Dao.RemoteKeysDao
-import com.example.roomdatabasewithpaging3.Data.Dogs
-import com.example.roomdatabasewithpaging3.Data.RemoteKeys
+import com.example.paging3_mvvm.Room.PassengerDAO
+import com.example.paging3_mvvm.Room.RemoteKeysDao
+import com.example.paging3_mvvm.models.Passenger
+import com.example.paging3_mvvm.models.RemoteKeys
 
-@Database(entities = [Dogs::class,RemoteKeys::class],version = 1,exportSchema = false)
+@Database(entities = [Passenger::class,RemoteKeys::class],version = 1,exportSchema = false)
 abstract class Database : RoomDatabase(){
 
-    abstract fun getDao(): Dao
+    abstract fun getPassengerDao(): PassengerDAO
     abstract fun remoteKeyDao():RemoteKeysDao
 }

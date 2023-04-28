@@ -22,13 +22,13 @@ object AppModule {
     @Provides
     @Singleton
     fun providesDatabase(context:Application) =
-        Room.databaseBuilder(context,Database::class.java,"DogDatabase")
+        Room.databaseBuilder(context,Database::class.java,"passengersDatabase")
             .build()
 
     @Provides
     @Singleton
     fun providesDao(database: Database) =
-        database.getDao()
+        database.getPassengerDao()
 
     @Provides
     @Singleton

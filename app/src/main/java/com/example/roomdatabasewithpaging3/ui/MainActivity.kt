@@ -8,8 +8,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.roomdatabasewithpaging3.Adapter.DogsAdapter
-import com.example.roomdatabasewithpaging3.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.roomdatabasewithpaging3.Adapter.PassengersPagingAdapter
 import com.example.roomdatabasewithpaging3.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val mainViewModel:MainViewModel  by viewModels()
     @Inject
-    lateinit var dogsAdapter: DogsAdapter
+    lateinit var passengerAdapter: PassengersPagingAdapter
     @ExperimentalPagingApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,23 +29,19 @@ class MainActivity : AppCompatActivity() {
         intiRecyclerView()
 
         lifecycleScope.launchWhenStarted {
-            mainViewModel.getAllDogs().collectLatest { response->
-                binding.apply {
-                    recyclerview.isVisible = true
-                    progressBar.isVisible = false
-                }
+            mainViewModel.getAllPassengers().collectLatest { response->
                 Log.d("main", "onCreate: $response")
-                dogsAdapter.submitData(response)
+                passengerAdapter.submitData(response)
             }
         }
 
     }
     private fun intiRecyclerView() {
         binding.apply {
-            recyclerview.apply {
+            rvPessengers.apply {
                 setHasFixedSize(true)
-                layoutManager = GridLayoutManager(this@MainActivity,2)
-                adapter = dogsAdapter
+                layoutManager = LinearLayoutManager(this@MainActivity)
+                adapter = passengerAdapter
             }
         }
     }

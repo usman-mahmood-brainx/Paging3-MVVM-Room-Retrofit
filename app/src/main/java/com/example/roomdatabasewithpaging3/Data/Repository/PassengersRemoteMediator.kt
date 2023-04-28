@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
 @ExperimentalPagingApi
-class DogsRemoteMediator constructor(
+class PassengersRemoteMediator constructor(
         private val db:Database,
         private val apiService: ApiService
 )  : RemoteMediator<Int,Passenger>() {
